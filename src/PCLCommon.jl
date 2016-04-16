@@ -2,8 +2,10 @@ module PCLCommon
 
 export @boostsharedptr, @defpcltype, @defptrconstructor, @defconstructor,
     BoostSharedPtr, use_count,
-    PointCloud, PointCloud2, transformPointCloud, compute3DCentroid,
-    removeNaNFromPointCloud, PCLPointCloud2, Correspondence, Correspondences,
+    PointCloud, PointCloud2,
+    PCLBase, setInputCloud, getInputCloud, setIndices, getIndices,
+    transformPointCloud, compute3DCentroid, removeNaNFromPointCloud,
+    PCLPointCloud2, Correspondence, Correspondences,
     ModelCoefficients, PointIndices, is_dense, width, height, points
 
 using LibPCL
@@ -190,6 +192,24 @@ width(cloud::PointCloudVal) = convert(Int, icxx"$(cloud.handle).width;")
 height(cloud::PointCloudVal) = convert(Int, icxx"$(cloud.handle).height;")
 is_dense(cloud::PointCloudVal) = icxx"$(cloud.handle).is_dense;"
 points(cloud::PointCloudVal) = icxx"$(handle(cloud)).points;"
+
+### PCLBase Interface ###
+
+abstract PCLBase
+
+function setInputCloud(base::PCLBase, cloud)
+    error("not implemented")
+end
+function getInputCloud(base::PCLBase)
+    error("not implemented")
+end
+function setIndices(base::PCLBase, indices)
+    error("not implemented")
+end
+function getIndices(base::PCLBase)
+    error("not implemented")
+end
+
 
 function transformPointCloud(cloud_in::PointCloud, cloud_out::PointCloud,
     transform)

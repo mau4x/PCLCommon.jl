@@ -4,7 +4,7 @@ export @boostsharedptr, @defpcltype, @defptrconstructor, @defconstructor,
     BoostSharedPtr, use_count,
     PointCloud, PointCloud2, transformPointCloud, compute3DCentroid,
     removeNaNFromPointCloud, PCLPointCloud2, Correspondence, Correspondences,
-    ModelCoefficients, PointIndices, is_dense, weight, height, points
+    ModelCoefficients, PointIndices, is_dense, width, height, points
 
 using LibPCL
 using Cxx
@@ -175,15 +175,6 @@ function setindex!(cloud::PointCloud, v, i::Integer, name::Symbol)
     p = icxx"&$(handle(cloud))->points[$i];"
     vp = @eval @cxx &($p->$name)
     unsafe_store!(vp, v, 1)
-end
-
-"""Create PointCloud instance and then load PCD data."""
-function (::Type{PointCloud{T}}){T}(path::AbstractString)
-    handle = @boostsharedptr "pcl::PointCloud<\$T>"
-    cloud = PointCloud(handle)
-    @assert !isempty(path)
-    pcl.load(path, cloud)
-    return cloud
 end
 
 push!{T}(cloud::PointCloud{T}, p) = icxx"$(handle(cloud))->push_back($p);"

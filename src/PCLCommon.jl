@@ -244,22 +244,22 @@ end
 @defpcltype Correspondences "pcl::Correspondences"
 @defptrconstructor Correspondences() "pcl::Correspondences"
 
-length(cs::Correspondences) = convert(Int, icxx"$(handle(cs))->size();")
+length(cs::Correspondences) = convert(Int, icxx"$(cs.handle)->size();")
 push!(cs::Correspondences, c::CorrespondenceVal) =
-    icxx"$(handle(cs))->push_back($(handle(c)));"
+    icxx"$(cs.handle)->push_back($(handle(c)));"
 
 @defpcltype ModelCoefficients "pcl::ModelCoefficients"
 @defptrconstructor ModelCoefficients() "pcl::ModelCoefficients"
 @defconstructor ModelCoefficientsVal() "pcl::ModelCoefficients"
 
 length(coef::ModelCoefficients) =
-    convert(Int, icxx"$(handle(coef))->values.size();")
+    convert(Int, icxx"$(coef.handle)->values.size();")
 
 @defpcltype PointIndices "pcl::PointIndices"
 @defptrconstructor PointIndices() "pcl::PointIndices"
 @defconstructor PointIndicesVal() "pcl::PointIndices"
 
 length(indices::PointIndices) =
-    convert(Int, icxx"$(handle(indices))->indices.size();")
+    convert(Int, icxx"$(indices.handle)->indices.size();")
 
 end # module

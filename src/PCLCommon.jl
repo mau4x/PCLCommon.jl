@@ -197,17 +197,17 @@ points(cloud::PointCloudVal) = icxx"$(handle(cloud)).points;"
 
 abstract PCLBase
 
-function setInputCloud(base::PCLBase, cloud)
-    error("not implemented")
+function setInputCloud(base::PCLBase, cloud::PointCloud)
+    icxx"$(base.handle)->setInputCloud($(cloud.handle));"
 end
 function getInputCloud(base::PCLBase)
-    error("not implemented")
+    icxx"$(base.handle)->getInputCloud();"
 end
 function setIndices(base::PCLBase, indices)
-    error("not implemented")
+    icxx"$(base.handle)->setIndices($(indices.handle));"
 end
 function getIndices(base::PCLBase)
-    error("not implemented")
+    icxx"$(base.handle)->getIndices();"
 end
 
 

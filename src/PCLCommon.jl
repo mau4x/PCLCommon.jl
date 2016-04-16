@@ -129,13 +129,13 @@ eltype{T}(cloud::PointCloudVal{T}) = T
 function show(io::IO, cloud::PointCloudPtr)
     println(io, "$(length(cloud))-element ", string(typeof(cloud)))
     println(io, "C++ representation:")
-    print(io, icxx"*$(handle(cloud));")
+    print(io, icxx"*$(cloud.handle);")
 end
 
 function show(io::IO, cloud::PointCloudVal)
     println(io, "$(length(cloud))-element ", string(typeof(cloud)))
     println(io, "C++ representation:")
-    print(io, icxx"$(handle(cloud));")
+    print(io, icxx"$(cloud.handle);")
 end
 
 import Base: similar
@@ -146,7 +146,7 @@ import Base: copy, deepcopy
 
 function deepcopy{T}(cloud::PointCloud{T})
     cloud_out = PointCloud{T}()
-    icxx"pcl::copyPointCloud(*$(handle(cloud)), *$(handle(cloud_out)));"
+    icxx"pcl::copyPointCloud(*$(cloud.handle), *$(cloud_out.handle));"
     cloud_out
 end
 
@@ -161,55 +161,55 @@ e.g. PointCloud{PointXYZRGB} to PointCloud{PointXYZ}
 """
 function convert{T}(::Type{PointCloud{T}}, cloud::PointCloud)
     cloud_out = PointCloud{T}()
-    icxx"pcl::copyPointCloud(*$(handle(cloud)), *$(handle(cloud_out)));"
+    icxx"pcl::copyPointCloud(*$(cloud.handle), *$(cloud_out.handle));"
     cloud_out
 end
 
-getindex(cloud::PointCloud, i::Integer) = icxx"$(handle(cloud))->at($i);"
+getindex(cloud::PointCloud, i::Integer) = icxx"$(cloud.handle)->at($i);"
 
 function getindex(cloud::PointCloud, i::Integer, name::Symbol)
-    p = icxx"&$(handle(cloud))->points[$i];"
+    p = icxx"&$(cloud.handle)->points[$i];"
     @eval @cxx $p->$name
 end
 function setindex!(cloud::PointCloud, v, i::Integer, name::Symbol)
-    p = icxx"&$(handle(cloud))->points[$i];"
+    p = icxx"&$(cloud.handle)->points[$i];"
     vp = @eval @cxx &($p->$name)
     unsafe_store!(vp, v, 1)
 end
 
-push!{T}(cloud::PointCloud{T}, p) = icxx"$(handle(cloud))->push_back($p);"
+push!{T}(cloud::PointCloud{T}, p) = icxx"$(cloud.handle)->push_back($p);"
 
-length(cloud::PointCloud) = convert(Int, icxx"$(handle(cloud))->size();")
-width(cloud::PointCloud) = convert(Int, icxx"$(handle(cloud))->width;")
-height(cloud::PointCloud) = convert(Int, icxx"$(handle(cloud))->height;")
-is_dense(cloud::PointCloud) = icxx"$(handle(cloud))->is_dense;"
-points(cloud::PointCloud) = icxx"$(handle(cloud))->points;"
+length(cloud::PointCloud) = convert(Int, icxx"$(cloud.handle)->size();")
+width(cloud::PointCloud) = convert(Int, icxx"$(cloud.handle)->width;")
+height(cloud::PointCloud) = convert(Int, icxx"$(cloud.handle)->height;")
+is_dense(cloud::PointCloud) = icxx"$(cloud.handle)->is_dense;"
+points(cloud::PointCloud) = icxx"$(cloud.handle)->points;"
 
-length(cloud::PointCloudVal) = convert(Int, icxx"$(handle(cloud)).size();")
-width(cloud::PointCloudVal) = convert(Int, icxx"$(handle(cloud)).width;")
-height(cloud::PointCloudVal) = convert(Int, icxx"$(handle(cloud)).height;")
-is_dense(cloud::PointCloudVal) = icxx"$(handle(cloud)).is_dense;"
+length(cloud::PointCloudVal) = convert(Int, icxx"$(cloud.handle).size();")
+width(cloud::PointCloudVal) = convert(Int, icxx"$(cloud.handle).width;")
+height(cloud::PointCloudVal) = convert(Int, icxx"$(cloud.handle).height;")
+is_dense(cloud::PointCloudVal) = icxx"$(cloud.handle).is_dense;"
 points(cloud::PointCloudVal) = icxx"$(handle(cloud)).points;"
 
 function transformPointCloud(cloud_in::PointCloud, cloud_out::PointCloud,
     transform)
-    icxx"pcl::transformPointCloud(*$(handle(cloud_in)),
-        *$(handle(cloud_out)), $transform);"
+    icxx"pcl::transformPointCloud(*$(cloud_in.handle),
+        *$(cloud_out.handle), $transform);"
 end
 
 function compute3DCentroid(cloud_in::PointCloud, vec4f)
-    icxx"pcl::compute3DCentroid(*$(handle(cloud_in)), $vec4f);"
+    icxx"pcl::compute3DCentroid(*$(cloud_in.handle), $vec4f);"
 end
 
 function removeNaNFromPointCloud(cloud_in::PointCloud,
     indices::CxxStd.StdVector{Cint})
-    icxx"pcl::removeNaNFromPointCloud(*$(handle(cloud_in)), $indices);"
+    icxx"pcl::removeNaNFromPointCloud(*$(cloud_in.handle), $indices);"
 end
 
 function removeNaNFromPointCloud(cloud_in::PointCloud, cloud_out::PointCloud,
     indices::CxxStd.StdVector{Cint})
-    icxx"pcl::removeNaNFromPointCloud(*$(handle(cloud_in)),
-        *$(handle(cloud_out)), $indices);"
+    icxx"pcl::removeNaNFromPointCloud(*$(cloud_in.handle),
+        *$(cloud_out.handle), $indices);"
 end
 
 @defpcltype PCLPointCloud2 "pcl::PCLPointCloud2"

@@ -83,7 +83,7 @@ for name in [
         global const $name = $cxxtdef
         global const $refname = $rcppdef
         global const $valorref = Union{$name, $refname}
-        export $name
+        export $name, $refname, $valorref
     end
 
     # no args constructor

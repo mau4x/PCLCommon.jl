@@ -197,18 +197,13 @@ points(cloud::PointCloudVal) = icxx"$(handle(cloud)).points;"
 
 abstract PCLBase
 
-function setInputCloud(base::PCLBase, cloud::PointCloud)
+setInputCloud(base::PCLBase, cloud::PointCloud) =
     icxx"$(base.handle)->setInputCloud($(cloud.handle));"
-end
-function getInputCloud(base::PCLBase)
-    icxx"$(base.handle)->getInputCloud();"
-end
-function setIndices(base::PCLBase, indices)
+getInputCloud(base::PCLBase) =
+    PointCloud(icxx"$(base.handle)->getInputCloud();")
+setIndices(base::PCLBase, indices) =
     icxx"$(base.handle)->setIndices($(indices.handle));"
-end
-function getIndices(base::PCLBase)
-    icxx"$(base.handle)->getIndices();"
-end
+getIndices(base::PCLBase) = icxx"$(base.handle)->getIndices();"
 
 
 function transformPointCloud(cloud_in::PointCloud, cloud_out::PointCloud,

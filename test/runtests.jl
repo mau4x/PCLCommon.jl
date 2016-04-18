@@ -65,3 +65,10 @@ end
     @test height(cloud) == 3
     @test is_dense(cloud) == true
 end
+
+@testset "std::vector" begin
+    @test length(icxx"std::vector<double>();") == 0
+    for n in 0:10
+        @test length(icxx"return std::vector<double>($n);") == n
+    end
+end

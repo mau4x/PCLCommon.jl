@@ -25,11 +25,3 @@ function Base.filter!(f, a::StdVector)
     end
     return a
 end
-
-(::Type{StdVector{T}}){T}() = icxx"std::vector<$T>();"
-
-function (::Type{StdVector{T}}){T}(n)
-     x = StdVector{T}()
-     @cxx x->resize(n) # TODO: should make icxx"std::vector<$T>($n);" works
-     return x
- end

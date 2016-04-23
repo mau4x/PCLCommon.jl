@@ -25,6 +25,7 @@ cxx"""
 
 typealias BoostSharedPtr{T} cxxt"boost::shared_ptr<$T>"
 use_count(s::BoostSharedPtr) = icxx"$s.use_count();"
+Base.pointer(s::BoostSharedPtr) = convert(Ptr{Void}, icxx"$s.get();")
 
 ### PointType definitions ###
 

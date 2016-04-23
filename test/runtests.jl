@@ -22,6 +22,7 @@ let
     cloud_copy = 0
     gc()
     @test use_count(cloud) == 1
+    @test pointer(cloud) != C_NULL
 end
 
 @testset "Point types" begin

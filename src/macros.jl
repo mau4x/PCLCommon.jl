@@ -128,6 +128,7 @@ macro defpcltype(expr, cxxname)
         @inline handle(x::$jlname_noparams_ptr) = x.handle
         @inline handle(x::$jlname_noparams_val) = x.handle
         use_count(x::$jlname_noparams_ptr) = icxx"$(x.handle).use_count();"
+        Base.pointer(x::$jlname_noparams_ptr) = convert(Ptr{Void}, icxx"$(x.handle).get();")
     end)
 
     #@show def

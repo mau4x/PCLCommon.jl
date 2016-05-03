@@ -76,11 +76,11 @@ for name in [
     :ReferenceFrame,
     :PointDEM,
     ]
-    refname = symbol(name, :Ref)
-    valorref = symbol(name, :ValOrRef)
+    refname = Symbol(name, :Ref)
+    valorref = Symbol(name, :ValOrRef)
     cppname = string("pcl::", name)
-    cxxtdef = Expr(:macrocall, symbol("@cxxt_str"), cppname);
-    rcppdef = Expr(:macrocall, symbol("@rcpp_str"), cppname);
+    cxxtdef = Expr(:macrocall, Symbol("@cxxt_str"), cppname);
+    rcppdef = Expr(:macrocall, Symbol("@rcpp_str"), cppname);
 
     @eval begin
         global const $name = $cxxtdef
@@ -90,7 +90,7 @@ for name in [
     end
 
     # no args constructor
-    body = Expr(:macrocall, symbol("@icxx_str"), string(cppname, "();"))
+    body = Expr(:macrocall, Symbol("@icxx_str"), string(cppname, "();"))
     @eval (::Type{$name})() = $body
 end
 

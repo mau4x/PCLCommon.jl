@@ -21,10 +21,10 @@ end
 macro boostsharedptr(name, args...)
     @assert length(args) <= 1
     if length(args) > 0 && args[1] != nothing
-        Expr(:macrocall, symbol("@icxx_str"), """
+        Expr(:macrocall, Symbol("@icxx_str"), """
         boost::shared_ptr<$name>(new $name($(args...)));""")
     else
-        Expr(:macrocall, symbol("@icxx_str"), """
+        Expr(:macrocall, Symbol("@icxx_str"), """
         boost::shared_ptr<$name>(new $name());""")
     end
 end
@@ -54,24 +54,24 @@ macro defpcltype(expr, cxxname)
     # build names
     if isa(jlname, Expr) && jlname.head == :curly
         jlname_noparams = jlname.args[1]
-        jlname_noparams_ptr = symbol(jlname_noparams, :Ptr)
+        jlname_noparams_ptr = Symbol(jlname_noparams, :Ptr)
         jlname_ptr = copy(jlname)
-        jlname_noparams_val = symbol(jlname_noparams, :Val)
+        jlname_noparams_val = Symbol(jlname_noparams, :Val)
         jlname_ptr.args[1] = jlname_noparams_ptr
         jlname_val = copy(jlname)
         jlname_val.args[1] = jlname_noparams_val
         pclname_ptr = copy(jlname_ptr)
-        pclname_ptr.args[1] = symbol(:pcl, pclname_ptr.args[1])
+        pclname_ptr.args[1] = Symbol(:pcl, pclname_ptr.args[1])
         pclname_val = copy(jlname_val)
-        pclname_val.args[1] = symbol(:pcl, pclname_val.args[1])
+        pclname_val.args[1] = Symbol(:pcl, pclname_val.args[1])
     else
         jlname_noparams = jlname
-        jlname_noparams_ptr = symbol(jlname_noparams, :Ptr)
+        jlname_noparams_ptr = Symbol(jlname_noparams, :Ptr)
         jlname_ptr = jlname_noparams_ptr
-        jlname_noparams_val = symbol(jlname_noparams, :Val)
+        jlname_noparams_val = Symbol(jlname_noparams, :Val)
         jlname_val = jlname_noparams_val
-        pclname_ptr = symbol(:pcl, jlname_ptr)
-        pclname_val = symbol(:pcl, jlname_val)
+        pclname_ptr = Symbol(:pcl, jlname_ptr)
+        pclname_val = Symbol(:pcl, jlname_val)
     end
 
     # build cxxt str
@@ -83,8 +83,8 @@ macro defpcltype(expr, cxxname)
         cxxtstr_body = string(cxxname)
     end
     cxxtstr_ptr_body = string("boost::shared_ptr<", cxxtstr_body, ">")
-    cxxptrtype = Expr(:macrocall, symbol("@cxxt_str"), cxxtstr_ptr_body)
-    cxxvaltype = Expr(:macrocall, symbol("@cxxt_str"), cxxtstr_body)
+    cxxptrtype = Expr(:macrocall, Symbol("@cxxt_str"), cxxtstr_ptr_body)
+    cxxvaltype = Expr(:macrocall, Symbol("@cxxt_str"), cxxtstr_body)
 
     # type body
     ptrtype_body = Expr(:(::), :handle, cxxptrtype)
@@ -175,7 +175,7 @@ function _defconstructor_impl(expr::Expr, cxxname, is_sharedptr::Bool)
     end
 
     # build shared pointer or value instantiation expr
-    cxxvalnew = Expr(:macrocall, symbol("@icxx_str"),
+    cxxvalnew = Expr(:macrocall, Symbol("@icxx_str"),
         string(cxxconstructor_def, "(", cxxconstructor_args, ");"))
     handledef = is_sharedptr ? quote
         @boostsharedptr $cxxconstructor_def $cxxconstructor_args

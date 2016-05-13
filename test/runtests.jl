@@ -73,3 +73,30 @@ end
         @test length(icxx"return std::vector<double>($n);") == n
     end
 end
+
+@testset "pcl::RangeImage" begin
+    # http://pointclouds.org/documentation/tutorials/range_image_creation.php
+    cloud = PointCloud{PointXYZ}()
+    for y in -0.5:0.01:0.5
+        for z in -0.5:0.01:0.5
+            push!(cloud, PointXYZ(2.0-y,y,z))
+        end
+    end
+    icxx"$(cloud.handle)->width = $(length(cloud));"
+    icxx"$(cloud.handle)->height = 1;"
+
+    angularResolution = 1.0 * pi/180
+    maxAngleWidth = 360 * pi/180
+    maxAngleHeight = 180 * pi/180
+    sensorPose = icxx"(Eigen::Affine3f)Eigen::Translation3f(0.0, 0.0, 0.0);"
+    coordinate_frame = CAMERA_FRAME
+    noiseLevel = 0.0
+    minRange = 0.0
+    borderSize = 1
+
+    rangeImage = RangeImage()
+    createFromPointCloud(rangeImage, cloud, angularResolution, maxAngleWidth,
+        maxAngleHeight, sensorPose, coordinate_frame, noiseLevel,
+        minRange, borderSize)
+    @test_approx_eq PCLCommon.getAngularResolution(rangeImage) angularResolution
+end

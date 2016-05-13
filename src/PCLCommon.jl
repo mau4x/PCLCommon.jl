@@ -21,6 +21,7 @@ cxx"""
 #include <pcl/common/common_headers.h>
 #include <pcl/common/transforms.h>
 #include <pcl/common/centroid.h>
+#include <pcl/range_image/range_image.h>
 """
 
 typealias BoostSharedPtr{T} cxxt"boost::shared_ptr<$T>"
@@ -119,6 +120,12 @@ function show(io::IO, p::PointXYZValOrRef)
     print(io, "(x,y,z): ");
     print(io, (x,y,z))
 end
+
+### Utils ###
+
+deg2rad(alpha::AbstractFloat) = icxx"pcl::deg2rad($alpha);"
+
+### PointCloud ###
 
 @defpcltype PointCloud{T} "pcl::PointCloud"
 @defptrconstructor PointCloud{T}() "pcl::PointCloud"
@@ -257,5 +264,7 @@ length(coef::ModelCoefficients) =
 
 length(indices::PointIndices) =
     convert(Int, icxx"$(indices.handle)->indices.size();")
+
+include("range_image.jl")
 
 end # module

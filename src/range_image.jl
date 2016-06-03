@@ -1,6 +1,6 @@
 export RangeImage, CoordinateFrame, createFromPointCloud
 
-const CoordinateFrame = Cxx.CppEnum{symbol("pcl::RangeImage::CoordinateFrame"),UInt32}
+const CoordinateFrame = Cxx.CppEnum{Symbol("pcl::RangeImage::CoordinateFrame"),UInt32}
 
 for name in [
     :CAMERA_FRAME,

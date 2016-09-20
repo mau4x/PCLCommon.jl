@@ -1,4 +1,5 @@
 using Cxx
+using DocStringExtensions
 
 function remove_type_annotation(e)
     if isa(e, Symbol)
@@ -18,6 +19,31 @@ function remove_type_annotation(args::Vector)
     ret_args
 end
 
+"""
+$(SIGNATURES)
+
+creates boost::shared_ptr expression (for package development)
+
+**Parameters**
+
+- `name` : C++ type name
+- `args` : argments will be passed to constructor
+
+template parameters in 1st argment and embedding expression in 2nd argment
+must be escaped.
+
+**Returns**
+
+- `handle` : C++ boost shared pointer of a given C++ type name and argments
+
+**Example**
+
+```julia
+handle = @boostsharedptr(
+    "pcl::visualization::PointCloudColorHandlerRGBField<\\\$T>",
+    "\\\$(cloud.handle)")
+```
+"""
 macro boostsharedptr(name, args...)
     @assert length(args) <= 1
     if length(args) > 0 && args[1] != nothing
@@ -30,16 +56,45 @@ macro boostsharedptr(name, args...)
 end
 
 """
-A macro to define PCL convenient types
+$(SIGNATURES)
 
-e.g. `@defpcltype PointCloud{T}` defines:
+A macro to define PCL convenient types. Mostly intended to be used by package
+development.
 
-- PointCloudPtr{T}: boost shared pointer of pcl::PointCloud (i.e.
-  pcl::PointCloud::Ptr) wrapper
-- PointCloudVal{T}: pcl::PointCloud value wrapper
-- PointCloud{T}: type aliased to PointCloudPtr
-- pclPointCloudPtr: pcl::PointCloud::Ptr
-- pclPointCloudVal: pcl::PointCloud
+**Parameters**
+
+- `expr` : Julia type name (can have type params)
+- `cxxname` : C++ type name
+
+**Example**
+
+```julia
+@defpcltype PointCloud{T} "pcl::PointCloud"
+
+```
+
+which defines Julia wrapper types for C++ types:
+
+- **PointCloudPtr{T}**: boost shared pointer of `pcl::PointCloud<T>` (i.e.
+  `pcl::PointCloud<T>::Ptr`) wrapper
+- **PointCloudVal{T}**: `pcl::PointCloud<T>` value wrapper
+- **PointCloud{T}**: type aliased to `PointCloudPtr{T}`
+
+and also Cxx types:
+
+- **pclPointCloudPtr{T}**: `pcl::PointCloud<T>::Ptr`
+- **pclPointCloudVal{T}**: `pcl::PointCloud<T>`
+
+With the combination of [`@defptrconstructor`](@ref), you can then use
+`pcl::PointCloud<T>::Ptr` (entirely used in PCL tutorials) as follows:
+
+```julia
+cloud = PointCloud{PointXYZ}()
+```
+
+Note that `PointCloud{T}` is a Julia wrapper, you can get the C++ representation
+as `PCLCommon.handle(cloud)` or use `handle = pclPointCloud{PointXYZ}()` which
+returns C++ type.
 """
 macro defpcltype(expr, cxxname)
     if isa(expr, Expr) && (expr.head == :comparison || expr.head == :<:)
@@ -136,10 +191,44 @@ macro defpcltype(expr, cxxname)
     return def
 end
 
+"""
+$(SIGNATURES)
+
+Defines convenient constructor for point types
+
+**Parameters**
+
+- `expr` : Constructor expression
+- `cxxname` : C++ type name
+
+**Examples**
+
+```julia
+@defptrconstructor PointCloud{PointT}() "pcl::PointCloud"
+```
+
+"""
 macro defptrconstructor(expr, cxxname)
     _defconstructor_impl(expr, cxxname, true)
 end
 
+"""
+$(SIGNATURES)
+
+Defines convenient constructor for value types
+
+**Parameters**
+
+- `expr` : Constructor expression
+- `cxxname` : C++ type name
+
+**Examples**
+
+```julia
+@defptrconstructor PointCloudVal{PointT}() "pcl::PointCloud"
+```
+
+"""
 macro defconstructor(expr, cxxname)
     _defconstructor_impl(expr, cxxname, false)
 end

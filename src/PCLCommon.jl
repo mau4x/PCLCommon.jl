@@ -1,3 +1,26 @@
+"""
+PCL common types, functions and utilities. The primary export is the
+`PointCloud{PointT}` (aliased to `PointCloudPtr{PointT}`), which represents a
+shared pointer of a point cloud (i.e. `pcl::PointCloud<PointT>::Ptr`) in PCL.
+You can create point clouds as follows:
+
+```@example
+using PCLCommon
+
+# Create empty point cloud
+cloud = PointCloud{PointXYZRGBA}()
+```
+
+or
+
+```@example
+using PCLCommon
+using PCLIO
+
+# Create and load point cloud from a PCD file
+cloud = PointCloud{PointXYZRGB}("your_pcd_file.pcd")
+```
+"""
 module PCLCommon
 
 export @boostsharedptr, @defpcltype, @defptrconstructor, @defconstructor,
@@ -6,11 +29,12 @@ export @boostsharedptr, @defpcltype, @defptrconstructor, @defconstructor,
     PCLBase, setInputCloud, getInputCloud, setIndices, getIndices,
     transformPointCloud, compute3DCentroid, removeNaNFromPointCloud,
     PCLPointCloud2, Correspondence, Correspondences,
-    ModelCoefficients, PointIndices, is_dense, width, height, points
+    ModelCoefficients, PointIndices
 
 using LibPCL
 using Cxx
 using CxxStd
+using DocStringExtensions
 
 include("macros.jl")
 include("std.jl")
@@ -24,7 +48,16 @@ cxx"""
 #include <pcl/range_image/range_image.h>
 """
 
+"""
+boost::shared_ptr<T>
+"""
 typealias BoostSharedPtr{T} cxxt"boost::shared_ptr<$T>"
+
+"""
+$(SIGNATURES)
+
+Returns reference count
+"""
 use_count(s::BoostSharedPtr) = icxx"$s.use_count();"
 Base.pointer(s::BoostSharedPtr) = convert(Ptr{Void}, icxx"$s.get();")
 
@@ -123,6 +156,9 @@ end
 
 ### Utils ###
 
+"""
+pcl::deg2rad
+"""
 deg2rad(alpha::AbstractFloat) = icxx"pcl::deg2rad($alpha);"
 
 ### PointCloud ###
@@ -133,12 +169,28 @@ deg2rad(alpha::AbstractFloat) = icxx"pcl::deg2rad($alpha);"
 @defconstructor PointCloudVal{T}() "pcl::PointCloud"
 @defconstructor PointCloudVal{T}(w::Integer, h::Integer) "pcl::PointCloud"
 
+"""
+pcl::PointCloud<PointT>::Ptr
+
+**Examples**
+
+```julia
+cloud = PointCloud{PointXYZ}("my_xyz_cloud.pcd")
+```
+
+```julia
+cloud = PointCloud{PointXYZRGBA}(100, 200) # width=100, height=200
+```
+
+"""
+PointCloud
+
 eltype{T}(cloud::PointCloud{T}) = T
 eltype{T}(cloud::PointCloudVal{T}) = T
 
 function show(io::IO, cloud::PointCloudPtr)
     println(io, "$(length(cloud))-element ", string(typeof(cloud)))
-    println(io, "C++ representation:")
+    println(io, "Dereferenced C++ representation:")
     print(io, icxx"*$(cloud.handle);")
 end
 
@@ -165,9 +217,16 @@ function copy(cloud::PointCloud)
 end
 
 """
+$(SIGNATURES)
+
 Converts a point cloud to a different type of point cloud
 
-e.g. PointCloud{PointXYZRGB} to PointCloud{PointXYZ}
+**Examples**
+
+```julia
+cloud = PointCloud{PointXYZRGB}()
+xyz_cloud = convert(PointCloud{PointXYZ}, cloud)
+```
 """
 function convert{T}(::Type{PointCloud{T}}, cloud::PointCloud)
     cloud_out = PointCloud{T}()
@@ -203,16 +262,21 @@ points(cloud::PointCloudVal) = icxx"$(handle(cloud)).points;"
 
 ### PCLBase Interface ###
 
+"""
+Similar to pcl::PCLBase, for dispatch
+"""
 abstract PCLBase
 
 setInputCloud(base::PCLBase, cloud::PointCloud) =
     icxx"$(base.handle)->setInputCloud($(cloud.handle));"
+
 getInputCloud(base::PCLBase) =
     PointCloud(icxx"$(base.handle)->getInputCloud();")
+
 setIndices(base::PCLBase, indices) =
     icxx"$(base.handle)->setIndices($(indices.handle));"
-getIndices(base::PCLBase) = icxx"$(base.handle)->getIndices();"
 
+getIndices(base::PCLBase) = icxx"$(base.handle)->getIndices();"
 
 function transformPointCloud(cloud_in::PointCloud, cloud_out::PointCloud,
     transform)

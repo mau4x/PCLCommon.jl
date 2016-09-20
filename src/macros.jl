@@ -139,7 +139,7 @@ macro defpcltype(expr, cxxname)
     else
         cxxtstr_body = string(cxxname)
 
-        cxxname_with_params_str = copy(cxxtstr_body)
+        cxxname_with_params_str = cxxtstr_body
     end
     cxxtstr_ptr_body = string("boost::shared_ptr<", cxxtstr_body, ">")
     cxxptrtype = Expr(:macrocall, Symbol("@cxxt_str"), cxxtstr_ptr_body)

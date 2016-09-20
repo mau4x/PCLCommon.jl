@@ -134,12 +134,19 @@ macro defpcltype(expr, cxxname)
         type_params = jlname.args[2:end]
         esc_type_params = map(x -> string("\$", x), type_params)
         cxxtstr_body = string(cxxname, "<", join(esc_type_params, ','), ">")
+
+        cxxname_with_params_str = string(cxxname, "<", join(type_params, ','), ">")
     else
         cxxtstr_body = string(cxxname)
+
+        cxxname_with_params_str = copy(cxxtstr_body)
     end
     cxxtstr_ptr_body = string("boost::shared_ptr<", cxxtstr_body, ">")
     cxxptrtype = Expr(:macrocall, Symbol("@cxxt_str"), cxxtstr_ptr_body)
     cxxvaltype = Expr(:macrocall, Symbol("@cxxt_str"), cxxtstr_body)
+
+    # For docs
+    jlname_noparams_ptrstr = string(jlname_noparams_ptr)
 
     # type body
     ptrtype_body = Expr(:(::), :handle, cxxptrtype)
@@ -154,25 +161,37 @@ macro defpcltype(expr, cxxname)
     end
 
     typdef = has_supertype ? quote
-        type $jlname_ptr <: $super_name
+        @doc """
+        Pointer representation for `$($cxxname_with_params_str)` in C++
+        """ type $jlname_ptr <: $super_name
             $ptrtype_body
         end
 
-        type $jlname_val <: $super_name
+        @doc """
+        Value representation for `$($cxxname_with_params_str)` in C++
+        """ type $jlname_val <: $super_name
             $valtype_body
         end
     end : quote
-        type $jlname_ptr
+        @doc """
+        Pointer representation for `$($cxxname_with_params_str)` in C++
+        """ type $jlname_ptr
             $ptrtype_body
         end
 
-        type $jlname_val
+        @doc """
+        Value representation for `$($cxxname_with_params_str)` in C++
+        """ type $jlname_val
             $valtype_body
         end
     end
 
     typaliases = quote
-        typealias $jlname $jlname_ptr
+        @doc """
+        Pointer representation for `$($cxxname_with_params_str)` in C++
+
+        typealias of [`$($jlname_noparams_ptrstr)`](@ref)
+        """ typealias $jlname $jlname_ptr
         typealias $pclname_ptr $cxxptrtype
         typealias $pclname_val $cxxvaltype
     end

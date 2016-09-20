@@ -11,8 +11,6 @@ using PCLCommon
 cloud = PointCloud{PointXYZRGBA}()
 ```
 
-or
-
 ```@example
 using PCLCommon
 using PCLIO
@@ -117,7 +115,9 @@ for name in [
     rcppdef = Expr(:macrocall, Symbol("@rcpp_str"), cppname);
 
     @eval begin
-        global const $name = $cxxtdef
+        @doc """
+        $($cppname)
+        """ global const $name = $cxxtdef
         global const $refname = $rcppdef
         global const $valorref = Union{$name, $refname}
         export $name, $refname, $valorref
@@ -163,27 +163,11 @@ deg2rad(alpha::AbstractFloat) = icxx"pcl::deg2rad($alpha);"
 
 ### PointCloud ###
 
-@defpcltype PointCloud{T} "pcl::PointCloud"
+@defpcltype PointCloud{PointT} "pcl::PointCloud"
 @defptrconstructor PointCloud{T}() "pcl::PointCloud"
 @defptrconstructor PointCloud{T}(w::Integer, h::Integer) "pcl::PointCloud"
 @defconstructor PointCloudVal{T}() "pcl::PointCloud"
 @defconstructor PointCloudVal{T}(w::Integer, h::Integer) "pcl::PointCloud"
-
-"""
-pcl::PointCloud<PointT>::Ptr
-
-**Examples**
-
-```julia
-cloud = PointCloud{PointXYZ}("my_xyz_cloud.pcd")
-```
-
-```julia
-cloud = PointCloud{PointXYZRGBA}(100, 200) # width=100, height=200
-```
-
-"""
-PointCloud
 
 eltype{T}(cloud::PointCloud{T}) = T
 eltype{T}(cloud::PointCloudVal{T}) = T

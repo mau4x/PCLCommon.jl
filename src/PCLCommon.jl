@@ -237,12 +237,14 @@ width(cloud::PointCloud) = convert(Int, icxx"$(cloud.handle)->width;")
 height(cloud::PointCloud) = convert(Int, icxx"$(cloud.handle)->height;")
 is_dense(cloud::PointCloud) = icxx"$(cloud.handle)->is_dense;"
 points(cloud::PointCloud) = icxx"$(cloud.handle)->points;"
+isOrganized(cloud::PointCloud) = icxx"$(cloud.handle)->isOrganized();"
 
 length(cloud::PointCloudVal) = convert(Int, icxx"$(cloud.handle).size();")
 width(cloud::PointCloudVal) = convert(Int, icxx"$(cloud.handle).width;")
 height(cloud::PointCloudVal) = convert(Int, icxx"$(cloud.handle).height;")
 is_dense(cloud::PointCloudVal) = icxx"$(cloud.handle).is_dense;"
 points(cloud::PointCloudVal) = icxx"$(handle(cloud)).points;"
+isOrganized(cloud::PointCloudVal) = icxx"$(cloud.handle).isOrganized();"
 
 ### PCLBase Interface ###
 

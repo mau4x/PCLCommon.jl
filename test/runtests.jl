@@ -2,7 +2,7 @@ using PCLCommon
 using Cxx
 using Base.Test
 
-import PCLCommon: PointCloudVal, StdVector
+import PCLCommon: PointCloudVal, StdVector, isOrganized, width, height, is_dense
 
 
 @testset "@boostsharedptr" begin
@@ -44,12 +44,14 @@ end
 @testset "PoindCloud" begin
     cloudxyz = PointCloud{PointXYZ}()
     @test (@cxx (cloudxyz.handle)->get()) != C_NULL
+    @test !isOrganized(cloudxyz)
     cloudxyzi = PointCloud{PointXYZI}()
     @test (@cxx (cloudxyzi.handle)->get()) != C_NULL
 
     cloud = PointCloud{PointXYZ}(2,3)
     @test width(cloud) == 2
     @test height(cloud) == 3
+    @test isOrganized(cloud)
 
     @test typeof(PointCloud{eltype(cloud)}()) == typeof(cloud)
     @test typeof(similar(cloud)) == typeof(cloud)
@@ -64,7 +66,8 @@ end
     @test length(cloud) == 6
     @test width(cloud) == 2
     @test height(cloud) == 3
-    @test is_dense(cloud) == true
+    @test is_dense(cloud)
+    @test isOrganized(cloud)
 end
 
 @testset "std::vector" begin

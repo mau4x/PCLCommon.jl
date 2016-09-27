@@ -4,14 +4,14 @@ PCL common types, functions and utilities. The primary export is the
 shared pointer of a point cloud (i.e. `pcl::PointCloud<PointT>::Ptr`) in PCL.
 You can create point clouds as follows:
 
-```@example
+```julia
 using PCLCommon
 
 # Create empty point cloud
 cloud = PointCloud{PointXYZRGBA}()
 ```
 
-```@example
+```julia
 using PCLCommon
 using PCLIO
 

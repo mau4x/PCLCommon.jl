@@ -1,22 +1,64 @@
 """
-PCL common types, functions and utilities. The primary export is the
+PCL common types, functions and utilities.
+
+
+## Basic usage
+
+The primary export is the
 `PointCloud{PointT}` (aliased to `PointCloudPtr{PointT}`), which represents a
 shared pointer of a point cloud (i.e. `pcl::PointCloud<PointT>::Ptr`) in PCL.
 You can create point clouds as follows:
 
 ```julia
 using PCLCommon
+```
 
+```julia
 # Create empty point cloud
 cloud = PointCloud{PointXYZRGBA}()
 ```
 
+which in C++ corresponds to:
+
+```c++
+pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud = pcl::PointCloud<pcl::PointXYZRGBA>::Ptr(
+        new pcl::PointCloud<pcl::PointXYZRGBA>);
+```
+
+If you want to load a point cloud from a PCD file, then use [PCLIO.jl](@ref):
+
 ```julia
 using PCLCommon
 using PCLIO
+```
 
+```julia
 # Create and load point cloud from a PCD file
 cloud = PointCloud{PointXYZRGB}("your_pcd_file.pcd")
+```
+
+or
+
+```julia
+cloud = PointCloud{PointXYZRGB}()
+loadPCDFile("your_pcd_file.pcd", cloud)
+```
+
+
+in C++:
+
+```c++
+pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud = pcl::PointCloud<pcl::PointXYZRGBA>::Ptr(
+        new pcl::PointCloud<pcl::PointXYZRGBA>);
+pcl::loadPCDFile("your_pcd_file.pcd", *cloud);
+```
+
+If you need a value representation rather than a smart pointer, then use
+`XXXVal` (e.g. PointCloudVal) instead:
+
+
+```julia
+cloud = PointCloudVal{PointXYZRGBA}()
 ```
 """
 module PCLCommon

@@ -191,9 +191,9 @@ macro defpcltype(expr, cxxname)
         Pointer representation for `$($cxxname_with_params_str)` in C++
 
         typealias of [`$($jlname_noparams_ptrstr)`](@ref)
-        """ typealias $jlname $jlname_ptr
-        typealias $pclname_ptr $cxxptrtype
-        typealias $pclname_val $cxxvaltype
+        """ $jlname = $jlname_ptr
+        $pclname_ptr = $cxxptrtype
+        $pclname_val = $cxxvaltype
     end
 
     def = esc(quote

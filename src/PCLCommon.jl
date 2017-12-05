@@ -91,7 +91,7 @@ cxx"""
 """
 boost::shared_ptr<T>
 """
-typealias BoostSharedPtr{T} cxxt"boost::shared_ptr<$T>"
+BoostSharedPtr{T} = cxxt"boost::shared_ptr<$T>"
 
 """
 $(SIGNATURES)
@@ -293,7 +293,7 @@ isOrganized(cloud::PointCloudVal) = icxx"$(cloud.handle).isOrganized();"
 """
 Similar to pcl::PCLBase, for dispatch
 """
-abstract PCLBase
+abstract type PCLBase end
 
 setInputCloud(base::PCLBase, cloud::PointCloud) =
     icxx"$(base.handle)->setInputCloud($(cloud.handle));"

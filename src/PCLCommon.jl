@@ -79,7 +79,7 @@ using DocStringExtensions
 include("macros.jl")
 include("std.jl")
 
-import Base: call, eltype, length, size, getindex, setindex!, push!, convert
+import Base: eltype, length, size, getindex, setindex!, push!, convert
 
 cxx"""
 #include <pcl/common/common_headers.h>
